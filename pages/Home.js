@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import MapView, { Marker } from 'react-native-maps';
 import { StyleSheet, View, Dimensions } from 'react-native';
 import { MyContext } from '../App';
@@ -24,17 +24,12 @@ function HomeScreen({ navigation }) {
       setMarkerCoords({...markerCoords, [counter]:marker})
     }
   
-    const markerPress = (e) => {
-      navigation.navigate('Details', { itemId:1, otherParam:2 })
-    }
-  
     const [markerCoords, setMarkerCoords] = useContext(MyContext)
   
     let markers = Object.values(markerCoords).map((marker, index) => (
         <Marker key={index} coordinate={marker} title='Marker' onPress={() => navigation.navigate('Details', { itemId:1, otherParam:2, marker:marker })} />
     ))
   
-    console.log("markerCoords: ", markerCoords)
     return (
       <View style={styles.container}>
         <MapView 

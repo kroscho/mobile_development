@@ -1,11 +1,11 @@
-import React, { useContext, useState } from 'react';
-import { Button, StyleSheet, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { StyleSheet, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { MyContext } from '../App';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 
 function DetailsScreen({ route, navigation }) {
-    const { itemId, otherParam, marker } = route.params;
+    const { marker } = route.params;
 
     const [markerCur, setMarkerCur] = useState(marker)
     const [markerCoords, setMarkerCoords] = useContext(MyContext)
@@ -24,7 +24,7 @@ function DetailsScreen({ route, navigation }) {
             return;
         }
         
-        let markers = Object.values(markerCoords).map((item, index) => {
+        let markers = Object.values(markerCoords).map((item) => {
             if (item === markerCur) {
                 let newImages = [...item.images, pickerResult.uri];
                 let mark = {
