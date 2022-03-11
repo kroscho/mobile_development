@@ -1,12 +1,55 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import MapView, { Marker } from 'react-native-maps';
 import { StyleSheet, View, Dimensions } from 'react-native';
 import { MyContext } from '../App';
+import MarkerService from '../services/MarkerService';
 
 var counter = 1;
+const markerService = new MarkerService()
+
+const initialMarkerCoords = {
+  0: {
+    name: "mark1",
+    latitude: 57.74725,
+    longitude: 56.4354,
+    images: [],
+  },
+  1: {
+    name: "mark2",
+    latitude: 57.76725,
+    longitude: 56.4354,
+    images: [],
+  },
+}
 
 function HomeScreen({ navigation }) {
-    const startRegion = {
+  const [db, setDb] = useContext(MyContext)
+  const [markerCoords, setMarkerCoords] = useState(initialMarkerCoords);
+  const [clickAdd, setClickAdd] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    //setIsLoading(false)
+    let listMarkers = {}
+    db.transaction(tx => {
+        tx.executeSql("select * from markers", [], (_, { rows }) => {
+            rows._array.forEach((elem, index) => {
+                let marker = {
+                latitude: elem.latitude,
+                longitude: elem.longitude,
+                name: elem.name,
+                id: elem.id
+                }
+                listMarkers = {...listMarkers, [index]:marker}
+            });
+            setMarkerCoords(listMarkers)
+            console.log("EFFECTMarkers: ", markerCoords)
+            //setIsLoading(true)
+        });
+    })
+  }, [clickAdd])
+
+  const startRegion = {
       latitude: 57.78825,
       longitude: 56.4324,
       latitudeDelta: 0.0922,
@@ -21,13 +64,21 @@ function HomeScreen({ navigation }) {
         images: [],
       }
       counter++;
-      setMarkerCoords({...markerCoords, [counter]:marker})
+      //setMarkerCoords({...markerCoords, [counter]:marker})
+      db.transaction(tx => {
+        tx.executeSql(
+          "INSERT INTO markers (name, latitude, longitude) values (?, ?, ?)", ["mark" + coords.latitude + coords.longitude, coords.latitude, coords.longitude]
+        );
+        tx.executeSql("select * from markers", [], (_, { rows }) =>
+            console.log("markers: ", JSON.stringify(rows.length))
+        );
+      }, null, setClickAdd(!clickAdd))
     }
   
-    const [markerCoords, setMarkerCoords] = useContext(MyContext)
-  
+    //const [markerCoords, setMarkerCoords] = useContext(MyContext)
+
     let markers = Object.values(markerCoords).map((marker, index) => (
-        <Marker key={index} coordinate={marker} title='Marker' onPress={() => navigation.navigate('Details', { itemId:1, otherParam:2, marker:marker })} />
+        <Marker key={index} coordinate={marker} title={marker.name} onPress={() => navigation.navigate('Details', { itemId:1, otherParam:2, marker:marker })} />
     ))
   
     return (
@@ -37,7 +88,10 @@ function HomeScreen({ navigation }) {
           region={startRegion}
           onPress={addMarker}
         >
-         {markers}
+         { isLoading 
+          ? markers
+          : null
+         }
         </MapView>
       </View>
     );

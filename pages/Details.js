@@ -7,8 +7,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 function DetailsScreen({ route, navigation }) {
     const { marker } = route.params;
 
+    const [db, setDb] = useContext(MyContext)
     const [markerCur, setMarkerCur] = useState(marker)
-    const [markerCoords, setMarkerCoords] = useContext(MyContext)
+    //const [markerCoords, setMarkerCoords] = useContext(MyContext)
 
     let openImagePickerAsync = async () => {
         let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
