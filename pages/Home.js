@@ -7,29 +7,13 @@ import MarkerService from '../services/MarkerService';
 var counter = 1;
 const markerService = new MarkerService()
 
-const initialMarkerCoords = {
-  0: {
-    name: "mark1",
-    latitude: 57.74725,
-    longitude: 56.4354,
-    images: [],
-  },
-  1: {
-    name: "mark2",
-    latitude: 57.76725,
-    longitude: 56.4354,
-    images: [],
-  },
-}
-
 function HomeScreen({ navigation }) {
   const [db, setDb] = useContext(MyContext)
-  const [markerCoords, setMarkerCoords] = useState(initialMarkerCoords);
+  const [markerCoords, setMarkerCoords] = useState({});
   const [clickAdd, setClickAdd] = useState(true)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    //setIsLoading(false)
     let listMarkers = {}
     db.transaction(tx => {
         tx.executeSql("select * from markers", [], (_, { rows }) => {
@@ -43,8 +27,8 @@ function HomeScreen({ navigation }) {
                 listMarkers = {...listMarkers, [index]:marker}
             });
             setMarkerCoords(listMarkers)
-            console.log("EFFECTMarkers: ", markerCoords)
-            //setIsLoading(true)
+            //console.log("EFFECTMarkers: ", markerCoords)
+            setDb(db)
         });
     })
   }, [clickAdd])
@@ -58,20 +42,14 @@ function HomeScreen({ navigation }) {
   
     const addMarker = (e) => {
       const coords = e.nativeEvent.coordinate;
-      let marker = {
-        latitude: coords.latitude,
-        longitude: coords.longitude,
-        images: [],
-      }
-      counter++;
-      //setMarkerCoords({...markerCoords, [counter]:marker})
+  
       db.transaction(tx => {
         tx.executeSql(
           "INSERT INTO markers (name, latitude, longitude) values (?, ?, ?)", ["mark" + coords.latitude + coords.longitude, coords.latitude, coords.longitude]
         );
-        tx.executeSql("select * from markers", [], (_, { rows }) =>
-            console.log("markers: ", JSON.stringify(rows.length))
-        );
+        //tx.executeSql("select * from markers", [], (_, { rows }) =>
+        //    console.log("markers: ", JSON.stringify(rows.length))
+       // );
       }, null, setClickAdd(!clickAdd))
     }
   

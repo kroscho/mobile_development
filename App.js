@@ -6,7 +6,7 @@ import DetailsScreen from './pages/Details';
 import * as SQLite from 'expo-sqlite';
 
 export const MyContext = React.createContext()
-const dbb = SQLite.openDatabase("testDb6.db");
+const dbb = SQLite.openDatabase("testDb9.db");
 
 const initialMarkerCoords = {
   0: {
@@ -20,7 +20,6 @@ const initialMarkerCoords = {
 const Stack = createNativeStackNavigator()
 
 export default function App() {
-  const [state, setState] = useState(initialMarkerCoords);
   const [db, setDb] = useState(dbb)
 
   useEffect(() => {
@@ -32,12 +31,10 @@ export default function App() {
           'CREATE TABLE IF NOT EXISTS images (id INTEGER PRIMARY KEY AUTOINCREMENT, uri TEXT)'
       );
       tx.executeSql(
-          'CREATE TABLE IF NOT EXISTS markerImages (id INTEGER PRIMARY KEY AUTOINCREMENT, markerId INT, imageId INT)'
+          'CREATE TABLE IF NOT EXISTS markerImages (id INTEGER PRIMARY KEY AUTOINCREMENT, markerId INT, imageUri TEXT)'
       );
       for (var i in initialMarkerCoords) {
-        console.log("name: ", initialMarkerCoords[i].name, initialMarkerCoords[i].latitude, initialMarkerCoords[i].longitude)
         tx.executeSql("select * from markers where name = ?", [initialMarkerCoords[i].name], (_, { rows }) =>  {
-          console.log("rows: ", rows.length, initialMarkerCoords[i].name )
           if (rows.length === 0) {
             tx.executeSql(
               "INSERT INTO markers (name, latitude, longitude) values (?, ?, ?)", [initialMarkerCoords[i].name, initialMarkerCoords[i].latitude, initialMarkerCoords[i].longitude]

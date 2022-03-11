@@ -9,7 +9,21 @@ function DetailsScreen({ route, navigation }) {
 
     const [db, setDb] = useContext(MyContext)
     const [markerCur, setMarkerCur] = useState(marker)
-    //const [markerCoords, setMarkerCoords] = useContext(MyContext)
+    const [markerCurImages, setMarkerCurImages] = useState([])
+    const [clickAdd, setClickAdd] = useState(true)
+
+    useEffect(() => {
+        db.transaction(tx => {
+            let listImages = []
+            tx.executeSql("select * from markerImages where markerId = ?", [markerCur.id], (_, { rows }) => {          
+                rows._array.forEach(elem => {
+                    listImages = [...listImages, elem.imageUri]
+                });
+                setMarkerCurImages(listImages)
+            })
+        })
+        setDb(db)
+    }, [clickAdd])
 
     let openImagePickerAsync = async () => {
         let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -24,25 +38,15 @@ function DetailsScreen({ route, navigation }) {
         if (pickerResult.cancelled === true) {
             return;
         }
-        
-        let markers = Object.values(markerCoords).map((item) => {
-            if (item === markerCur) {
-                let newImages = [...item.images, pickerResult.uri];
-                let mark = {
-                    latitude: item.latitude,
-                    longitude: item.longitude,
-                    images: newImages,
-                }
-                setMarkerCur(mark)
-                return mark;
-            }
-            return item;
-        })
 
-        setMarkerCoords(markers)
+        db.transaction(tx => {      
+            tx.executeSql(
+              "INSERT INTO markerImages (markerId, imageUri) values (?, ?)", [markerCur.id, pickerResult.uri]
+            );
+        }, null, setClickAdd(!clickAdd))
     };
 
-    let images = markerCur.images.map((image, index) => (
+    let images = markerCurImages.map((image, index) => (
         <Image
             key={index}
             source={{ uri: image }}
@@ -50,7 +54,7 @@ function DetailsScreen({ route, navigation }) {
         />
     ))
 
-    const styleScrollView = markerCur.images.length !== 0 ? styles.scrollView : styles.scrollViewNone;
+    const styleScrollView = markerCurImages.length !== 0 ? styles.scrollView : styles.scrollViewNone;
 
     return (
         <View style={styles.container}>
@@ -62,7 +66,7 @@ function DetailsScreen({ route, navigation }) {
                     colors={['#020024', '#93f6e6', '#6ebbc4' ]}
                     style={styleScrollView}
                     >                
-                    {markerCur.images.length !== 0
+                    {markerCurImages.length !== 0
                         ? images
                         : null
                     }

@@ -10,13 +10,13 @@ class MarkerService {
         console.log("Создание")
         db.transaction(tx => {
             tx.executeSql(
-              'CREATE TABLE IF NOT EXISTS markers (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, latitude REAL, longitude REAL)'
+                'CREATE TABLE IF NOT EXISTS markers (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, latitude REAL, longitude REAL)'
             );
             tx.executeSql(
                 'CREATE TABLE IF NOT EXISTS images (id INTEGER PRIMARY KEY AUTOINCREMENT, uri TEXT)'
             );
             tx.executeSql(
-                'CREATE TABLE IF NOT EXISTS markerImages (id INTEGER PRIMARY KEY AUTOINCREMENT, markerId INT, imageId INT)'
+                'CREATE TABLE IF NOT EXISTS markerImages (id INTEGER PRIMARY KEY AUTOINCREMENT, marker_id INT, image_uri TEXT)'
             );
         })
     }
