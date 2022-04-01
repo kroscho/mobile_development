@@ -7,13 +7,15 @@ import DetailsScreen from './pages/Details';
 export const MyContext = React.createContext()
 const initialMarkerCoords = {
   0: {
-    latitude: 57.74725,
-    longitude: 56.4354,
+    id: 0,
+    latitude: 58.0072,
+    longitude: 56.2346,
     images: [],
   },
   1: {
-    latitude: 57.76725,
-    longitude: 56.4354,
+    id: 1,
+    latitude: 58.0068,
+    longitude: 56.2277,
     images: [],
   },
 }
