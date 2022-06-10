@@ -6,15 +6,16 @@ import DetailsScreen from './pages/Details';
 import * as SQLite from 'expo-sqlite';
 
 export const MyContext = React.createContext()
-const dbb = SQLite.openDatabase("testDb9.db");
+const dbb = SQLite.openDatabase("testDb12.db");
 
 const initialMarkerCoords = {
   0: {
-    name: "mark1",
-    latitude: 57.74725,
-    longitude: 56.4354,
+    id: 1,
+    name: "Marker1",
+    latitude: 58.0072,
+    longitude: 56.2346,
     images: [],
-  }
+  },
 }
 
 const Stack = createNativeStackNavigator()
